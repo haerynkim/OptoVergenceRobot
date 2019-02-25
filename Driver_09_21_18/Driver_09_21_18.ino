@@ -174,10 +174,12 @@ void loadInfo() {
       if (*coeffs == 1) {
         Blink(BLUE);
         Serial.println("ForwardCoeffsReceived");
+        // Serial.println(coeffsString);
       }
       if (*coeffs == 2) {/*if the reverse_coeffs has been received from MATLAB*/
         Blink(GREEN);
         Serial.println("ReverseCoeffsReceived");
+        // Serial.println(coeffsString);
         break; /*break from the while loop*/
       }
     }

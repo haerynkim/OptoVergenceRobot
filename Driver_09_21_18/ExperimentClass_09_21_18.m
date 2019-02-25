@@ -37,19 +37,20 @@ classdef ExperimentClass_09_21_18 < handle
             flushinput(obj.connection);
             
             % Save parameters (forward_coeffs, reverse_coeffs) that will be sent from MATLAB
-            % to Arduino at start of each experiment
-            parameters = load(obj.save_filename);
+%             % to Arduino at start of each experiment
+            parameters = load(obj.save_filename)
+            
             obj.forward_coeffs = parameters.forward_coeffs;
             obj.reverse_coeffs = parameters.reverse_coeffs;
             forward_coeffs = obj.forward_coeffs;
             reverse_coeffs = obj.reverse_coeffs;
-            
+             
             waitSignal = check(obj) %should receive "ReadyToReceiveCoeffs"
             sendCoeffs(obj, forward_coeffs);
             waitSignal = check(obj) %should receive "ForwardCoeffsReceived"
             sendCoeffs(obj, reverse_coeffs);
             waitSignal = check(obj) %should receive "ReverseCoeffsReceived"
-            
+%              
             waitSignal = check(obj) %fscanf(obj.connection,'%s') %read from Arduino; should receive "Ready"
         end
         
