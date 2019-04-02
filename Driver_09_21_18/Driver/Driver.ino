@@ -29,13 +29,13 @@ unsigned long location[2] = {0, 0}; /*presetting location*/
 /*arbitrary upper limit for location input, with lower limit of 0*/
 int virtDimX = 50; /* max x dimension that can be inputted*/
 int virtDimY = 50; /*max y dimension that can be inputted*/
-int Delay = 1000; /*default Delay for calibration and basic movement actions in terms of square pulse width (microseconds)*/
+int Delay = 30; /*default Delay for calibration and basic movement actions in terms of square pulse width (microseconds)*/
 float pi = 3.14159265359; /*numerical value used for pi*/
 String val; /*String object to store inputs read from the Serial Connection*/
 String coeffsString; /*String object to store speed model coefficients sent from MATLAB*/
 float coeffsArray; /*for parsing speed model coefficients*/
 float forward_coeffs[16]; /*used in delayToSpeed function*/
-double reverse_coeffs[16]; /*used in speedToDelay function*/
+float reverse_coeffs[16]; /*used in speedToDelay function*/
 
 /*Blink an LED twice
  * input: specific LED pin
@@ -396,7 +396,7 @@ void line(long x1, long y1, int v) { /*inputs: x-component of vector, y-componen
   long changey = y1 - location[1];
   long angles_radians = atan2(changex, changey); 
   /* Call speedToDelay function to change the speed input to delay. Now 'v' is speed*/
-  v = speedToDelay(reverse_coeffs, v, angles_radians); /* converts int v (Speed) to delay.*/
+  v = speedToDelay(reverse_coeffs[16] v, angles_radians); /* converts int v (Speed) to delay.*/
   location[0] += x1; /*add x1 to current x-coordinate location*/
   location[1] += y1; /*add y1 to current y-coordinate location*/
   long x0 = 0, y0 = 0;
@@ -487,7 +487,7 @@ void setup()
   dimensions[0] = *i * microsteps; //106528; /*x-dimension*/
   dimensions[1] = *(i + 1) * microsteps; //54624; /*y-dimension*/
   
-  //loadInfo();
+  loadInfo();
   Serial.println("Ready");
   //digitalWrite(GREEN, HIGH);
 }
