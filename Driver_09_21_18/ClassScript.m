@@ -1,6 +1,6 @@
 system = computer();
 if strcmp(system, 'MACI64')
-    serialPort = '/dev/tty.usbmodem1421';
+    serialPort = '/dev/cu.usbmodem1411';
 else
     serialPort = 'COM5';
 end
@@ -19,7 +19,7 @@ a = ExperimentClass(serialPort);
 % 
 %a.calibrate();
 %
-%a.moveTo(10,5,100); % x cm, y cm, hold ms
-a.speedModelFit(150,550,15,12);
+a.moveTo(10,5,100); % x cm, y cm, hold ms
+%a.speedModelFit(150,550,15,12);
 %
 a.endSerial();
