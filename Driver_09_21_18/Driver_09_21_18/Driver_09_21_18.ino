@@ -90,9 +90,9 @@ double* parseCommand(char strCommand[]) { /*inputs are null terminated character
        Numerical Inputs:
        (x0,y0) - destination coordinates in designated coordinate system
        hold - hold target at (x0,y0) for milliseconds
-       move:x0:y0:hold duration
+       move:x0:y0:hold duration:speed
     */
-    static double inputs[4];
+    static double inputs[5];
     inputs[0] = 2; /*set first element in array to 2, switch case for move*/
     int i = 1;
     /*assign numerical inputs to spaces in array*/
@@ -419,7 +419,14 @@ void line(long x1, long y1, int v) { /*inputs: x-component of vector, y-componen
   }
 }
 
-
+void findAngle(long x1, long y1, long x0, long y0){ /*inputs: final x destination; final y destination, initial x location, ...
+ * initial y location
+ */
+  long dispx = x1 - x0;
+  long dispy = y1 - y0;
+  double angle_radians = atan2(dispx, dispy);
+  return angle_radians;
+}
 
 /* Main setup function
    Verifies serial connection and traces edges for dimensions
@@ -499,29 +506,43 @@ void loop()
         delay(1000);
         digitalWrite(GREEN, HIGH); /*turn off green*/
         break;
-      case 2: // moveTo:x0:y0:hold duration 
+      case 2: // moveTo:x0:y0:hold duration:speed
       //BLUE
         /* Simple move to designated location and holds for a certain time
         */
-        
+
+        /* Allocate memory for and retrieve designated locations */
+        long x1 = (*(command +1)); /* destination in x-direction */
+        long y1 = (*(command +2)); /* destination in y-direction */
+
+        /* Find angle of tangent between two points*/
+        double ang = findAngle(location[0], location[1], x1, y1);
+
         /* scale the input location from centimeter to microsteps */
-        
         long locx;
         long locy;
 
         locx = (long) (*(command + 1) / (2*pi*motor_radius) * 200 * microsteps);
         locy = (long) (*(command + 2) / (2*pi*motor_radius) * 200 * microsteps);
-        /* safty check, if the desired location beyond the dimensions, constrain it to the far point  */
+
+
+        /* safety check, if the desired location beyond the dimensions, constrain it to the far point  */
         if (locx > dimensions[0]) { dispx = dimensions[0]; };
         if (locy > dimensions[1]) { dispy = dimensions[1]; };
     
         /* displacement in scale of microsteps*/
-        dispx = locx - location[0]; /* Converting input virtual dimensions to microsteps*/
+        dispx = locx - location[0]; /* Converting input virtual dimensions to microsteps */
         dispy = locy - location[1];
-        
-        /*move by designated vector displacement*/
-        digitalWrite(BLUE, LOW);/*turn on blue*/
-        line(dispx, dispy, Delay);
+
+        /* Converts input speed to delay         */
+        double speed; /* allocate memory for speed input*/
+        speed = (*(command + 4)); /* retrieve speed input into variable */
+        double newDelay; /* allocate memory for delay input into line function */
+        newDelay = speedToDelay(reverse_coeffs, speed, ang); /* convert desired speed to delay */
+
+        /* move by designated vector displacement*/
+        digitalWrite(BLUE, LOW); /*turn on blue*/
+        line(dispx, dispy, newDelay);
         Serial.println("Done");
         delay(*(command + 3)); /*delay by the specified hold duration*/
         digitalWrite(BLUE, HIGH);/*turn off blue*/
